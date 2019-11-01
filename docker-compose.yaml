@@ -1,0 +1,31 @@
+version: '2.1'
+
+services:
+    approval-app-server:
+        build: ./approval-service/target/docker/
+        ports:
+            - "8081:8081"
+        depends_on:
+            postgres:
+                condition: service_healthy
+
+    order-app-server:
+        build: ./order-service/target/docker/
+        ports:
+            - "8080:8080"
+        depends_on:
+            postgres:
+                condition: service_healthy
+
+    postgres:
+        image: postgres:latest
+        ports:
+            -   "5432:5432"
+        environment:
+            - DEBUG=false
+            - POSTGRES_PASSWORD=postgres
+        healthcheck:
+              test: ["CMD-SHELL", "pg_isready -U postgres"]
+              interval: 5s
+              timeout: 2s
+              retries: 5
